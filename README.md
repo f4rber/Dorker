@@ -142,20 +142,4 @@ not vulnerable!
 
 https://www.laboshop.com/index.php?id=5&L=1
 not vulnerable!
-
-http://www.catsg.org/index.php?id=196
-not vulnerable!
-
-http://kbu.org.ua/index.php?id=30
-not vulnerable!
-
-http://www.eframeproject.eu/index.php?id=107
-not vulnerable!
-
-http://www.ewea.org/members-login/?redirect_url=/index.php?id=76
-not vulnerable!
-
-https://www.usbr.gov/projects/index.php?id=424
-not vulnerable!
-
 ```
