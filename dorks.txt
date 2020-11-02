@@ -1,0 +1,2 @@
+inurl:index.php?id=
+inurl:index.php?cid=
