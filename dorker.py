@@ -1,37 +1,15 @@
 import os
 import random
 import urllib3
-import requests
 import platform
 from colorama import Fore
 from bs4 import BeautifulSoup
+from bin.usr_agnt import rndm_ua
 
 version = "1.0"
 info = (Fore.RESET + "\n  Dorker" + "\n   Version: " + version + " made with ♥ by FARBER")
 result_name = "dorker_results.txt"
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-bad_start = ["http://cxsecurity.com", "https://cxsecurity.com", "https://bing.com", "https://msn.com",
-             "https://microsoft.com", "https://drupal", "https://github.com", "https://superuser.com",
-             "https://yahoo.com", "https://live.com", "https://microsofttranslator.com", "https://irongeek.com",
-             "https://tefneth-import.com", "https://hackforums.net", "https://freelancer.com",
-             "https://facebook.com", "https://mozilla.org", "https://stackoverflow.com", "https://php.net",
-             "https://wikipedia.org", "https://amazon.com", "https://4shared.com", "https://wordpress.org",
-             "https://about.com", "https://phpbuilder.com", "https://phpnuke.org", "https://linearcity.hk",
-             "https://youtube.com", "https://ptjaviergroup.com", "https://p4kurd.com", "https://tizag.com",
-             "https://discoverbing.com", "https://devshed.com", "https://ashiyane.org", "https://owasp.org",
-             "https://1923turk.com", "https://fictionbook.org", "https://silenthacker.do.am", "https://v4-team.com",
-             "https://codingforums.com", "https://tudosobrehacker.com", "https://zymic.com",
-             "https://forums.whirlpool.net.au", "https://gaza-hacker.com", "https://immortaltechnique.co.uk",
-             "https://w3schools.com", "https://phpeasystep.com", "https://mcafee.com", "https://blogs.oracle.com",
-             "https://specialinterestarms.com", "https://pastesite.com", "https://pastebin.com",
-             "https://joomla.org", "https://joomla.fr", "https://sourceforge.net", "https://joesjewelry.com",
-             "https://t.umblr.com", "https://vk.com", "https://joomla.", "https://askubuntu.com",
-             "https://www.cloudlinux.com", "https://www.php.net", "https://www.slideshare.net",
-             "https://www.digitalocean.com", "https://wiki.archlinux.org", "https://developer.wordpress.org",
-             "https://www.facebook.com", "https://www.linkedin.com", "https://linkedin.com", "https://searchfeed",
-             "http://stackoverflow.com", "https://vk.com", "http://t.umblr.com"
-             ]
 
 ua = ['Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; de) Opera 8.0',
       'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; zh-cn) Opera 8.65',
@@ -209,68 +187,93 @@ ua = ['Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; de) Opera 8.0',
       'Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)',
       'Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN) AppleWebKit/533+ (KHTML, like Gecko)']
 
-headers = requests.utils.default_headers()
-headers.update(
-    {
-        'User-Agent': random.choice(ua)
-    })
+header = {'User-Agent': random.choice(ua)}
+http = urllib3.PoolManager(2, headers=header)
+
+bad_start = ["http://cxsecurity.com", "https://cxsecurity.com", "https://bing.com", "https://msn.com",
+             "https://microsoft.com", "https://drupal", "https://github.com", "https://superuser.com",
+             "https://yahoo.com", "https://live.com", "https://microsofttranslator.com", "https://irongeek.com",
+             "https://tefneth-import.com", "https://hackforums.net", "https://freelancer.com",
+             "https://facebook.com", "https://mozilla.org", "https://stackoverflow.com", "https://php.net",
+             "https://wikipedia.org", "https://amazon.com", "https://4shared.com", "https://wordpress.org",
+             "https://about.com", "https://phpbuilder.com", "https://phpnuke.org", "https://linearcity.hk",
+             "https://youtube.com", "https://ptjaviergroup.com", "https://p4kurd.com", "https://tizag.com",
+             "https://discoverbing.com", "https://devshed.com", "https://ashiyane.org", "https://owasp.org",
+             "https://1923turk.com", "https://fictionbook.org", "https://silenthacker.do.am", "https://v4-team.com",
+             "https://codingforums.com", "https://tudosobrehacker.com", "https://zymic.com",
+             "https://forums.whirlpool.net.au", "https://gaza-hacker.com", "https://immortaltechnique.co.uk",
+             "https://w3schools.com", "https://phpeasystep.com", "https://mcafee.com", "https://blogs.oracle.com",
+             "https://specialinterestarms.com", "https://pastesite.com", "https://pastebin.com",
+             "https://joomla.org", "https://joomla.fr", "https://sourceforge.net", "https://joesjewelry.com",
+             "https://t.umblr.com", "https://vk.com", "https://joomla.", "https://askubuntu.com",
+             "https://www.cloudlinux.com", "https://www.php.net", "https://www.slideshare.net",
+             "https://www.digitalocean.com", "https://wiki.archlinux.org", "https://developer.wordpress.org",
+             "https://www.facebook.com", "https://www.linkedin.com", "https://linkedin.com", "https://searchfeed",
+             "http://stackoverflow.com", "https://vk.com", "http://t.umblr.com", "https://www.w3.org",
+             "https://developer.mozilla.org"]
 
 colors = list(vars(Fore).values())
 if '\x1b[30m' in colors:
     # While
     # colors.remove('\x1b[30m')
     # Red
-    colors.remove('\x1b[31m')
+    # colors.remove('\x1b[31m')
     # Purple
-    colors.remove('\x1b[35m')
+    # colors.remove('\x1b[35m')
     # Yellow
     colors.remove('\x1b[32m')
     # Icy
     # colors.remove('\x1b[36m')
     # Navy white
-    # colors.remove('\x1b[37m')
+    colors.remove('\x1b[37m')
     # Blue
     # colors.remove('\x1b[34m')
     # Another yellow
-    colors.remove('\x1b[33m')
+    # colors.remove('\x1b[33m')
     # Navy white
     colors.remove('\x1b[39m')
-    # Grey
-    colors.remove('\x1b[90m')
     # Navy red
-    colors.remove('\x1b[91m')
+    # colors.remove('\x1b[91m')
     # Yellow
-    colors.remove('\x1b[92m')
+    # colors.remove('\x1b[92m')
     # Navy yellow
-    colors.remove('\x1b[93m')
+    # colors.remove('\x1b[93m')
     # Navy Blue
     # colors.remove('\x1b[94m')
     # Violet
-    colors.remove('\x1b[95m')
+    # colors.remove('\x1b[95m')
     # Light blue
     # colors.remove('\x1b[96m')
     # Black
     colors.remove('\x1b[97m')
+    # Grey
+    colors.remove('\x1b[90m')
 
 
 def dorker_logo():
     dorker_logotypes = [r'''
-▓█████▄  ▒█████   ██▀███   ██ ▄█▀▓█████  ██▀███  
-▒██▀ ██▌▒██▒  ██▒▓██ ▒ ██▒ ██▄█▒ ▓█   ▀ ▓██ ▒ ██▒
-░██   █▌▒██░  ██▒▓██ ░▄█ ▒▓███▄░ ▒███   ▓██ ░▄█ ▒
-░▓█▄   ▌▒██   ██░▒██▀▀█▄  ▓██ █▄ ▒▓█  ▄ ▒██▀▀█▄  
-░▒████▓ ░ ████▓▒░░██▓ ▒██▒▒██▒ █▄░▒████▒░██▓ ▒██▒
- ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░▒ ▒▒ ▓▒░░ ▒░ ░░ ▒▓ ░▒▓░
- ░ ▒  ▒   ░ ▒ ▒░   ░▒ ░ ▒░░ ░▒ ▒░ ░ ░  ░  ░▒ ░ ▒░
- ░ ░  ░ ░ ░ ░ ▒    ░░   ░ ░ ░░ ░    ░     ░░   ░ 
-   ░        ░ ░     ░     ░  ░      ░  ░   ░     
- ░                                               
+     ____  ____  ____  __ __ __________ 
+    / __ \/ __ \/ __ \/ //_// ____/ __ \
+   / / / / / / / /_/ / ,<  / __/ / /_/ /
+  / /_/ / /_/ / _, _/ /| |/ /___/ _, _/ 
+ /_____/\____/_/ |_/_/ |_/_____/_/ |_|
 ''', r'''
-  ____             _             
- |  _ \  ___  _ __| | _____ _ __ 
- | | | |/ _ \| '__| |/ / _ \ '__|
- | |_| | (_) | |  |   <  __/ |   
- |____/ \___/|_|  |_|\_\___|_|   
+    ___      __     ___    _  __    ___     ___   
+   |   \    /  \   | _ \  | |/ /   | __|   | _ \  
+   | |) |  | () |  |   /  | ' <    | _|    |   /  
+   |___/   _\__/   |_|_\  |_|\_\   |___|   |_|_\  
+ _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""| 
+ "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 
+''', r'''
+ .--.  .--. .--. .   ..---..--. 
+ |   ::    :|   )|  / |    |   )
+ |   ||    ||--' |-'  |--- |--' 
+ |   ;:    ;|  \ |  \ |    |  \ 
+ '--'  `--' '   `'   `'---''   `
+''', r'''
+ +-+-+-+-+-+-+
+ |D|O|R|K|E|R|
+ +-+-+-+-+-+-+
 ''']
     logotype = random.choice(dorker_logotypes)
     if platform.system() == "Windows":
@@ -294,8 +297,11 @@ def dorker():
         while c < int(a):
             while pages != int(how_much):
                 # print("\n\n\nTrying dork: " + str(dorks[c]))
-                send = requests.get("http://www1.search-results.com/web?q=" + str(dorks[c]) + "&page=" + str(pages))
-                parsing = BeautifulSoup(send.text, features="html.parser")
+                # send = requests.get("http://www1.search-results.com/web?q=" + str(dorks[c]) + "&page=" + str(pages))
+                # parsing = BeautifulSoup(send.text, features="html.parser")
+                send = http.request("GET", "http://www1.search-results.com/web?q=" + str(dorks[c]) + "&page="
+                                    + str(pages))
+                parsing = BeautifulSoup(send.data.decode('utf-8'), features="html.parser")
                 for data in parsing.find_all("cite"):
                     print(data.string)
                     f = open(result_name, "a", encoding="utf=8")
@@ -307,8 +313,8 @@ def dorker():
         user_dork = input("[+] Enter your dork:\n[OPTION] ==> ")
         while pages != int(how_much):
             # print(Fore.RESET + "\n\n\nTrying dork: " + user_dork)
-            send = requests.get("http://www1.search-results.com/web?q=" + user_dork + "&page=" + str(pages))
-            parsing = BeautifulSoup(send.text, features="html.parser")
+            send = http.request("GET", "http://www1.search-results.com/web?q=" + user_dork + "&page=" + str(pages))
+            parsing = BeautifulSoup(send.data.decode('utf-8'), features="html.parser")
             for data in parsing.find_all("cite"):
                 print(data.string)
                 f = open(result_name, "a", encoding="utf=8")
@@ -323,7 +329,6 @@ def checker():
     else:
         os.system("clear")
     print(Fore.RESET + "SQLi CHECKER\n")
-    http = urllib3.PoolManager()
     decision1 = input(Fore.RESET + "[+] Delete old file? [y/n]\n[OPTION] ==> ")
     if decision1 == "y":
         urls = open(r"injectableURL.txt", mode="w")
@@ -349,7 +354,7 @@ def checker():
                     x = x + 1
                     continue
 
-            send = http.request("GET", str(dork_urls[x]) + "'", headers=headers)
+            send = http.request("GET", str(dork_urls[x]) + "'")
 
             if bytes(error1, encoding="utf-8") in send.data:
                 print(Fore.GREEN + str(dork_urls[x]) + "seems vulnerable!\n")
@@ -369,15 +374,32 @@ def checker():
         x = x + 1
 
 
-dorker_logo()
-decision2 = input(Fore.RESET + "[+] Starting to crawl? [y/n]\n[OPTION] ==> ")
-if decision2 == "y":
-    dorker()
-else:
-    print(Fore.RESET + "[+] Skipping...")
+def main():
+    dorker_logo()
+    usr_inpt = input('''
+[1] Dorker
+[2] SQLi checker
+[3] Exit
+[!] ==> ''')
+    if usr_inpt == "1":
+        dorker()
+        decision = input(Fore.RESET + "\n[+] Run SQLi checker? [y/n]\n[OPTION] ==> ")
+        if decision == "y":
+            checker()
+            print(Fore.RESET + "Thanks for using D0RK3R!")
+            exit(0)
+        else:
+            print(Fore.RESET + "Thanks for using D0RK3R!")
+            exit(0)
 
-decision3 = input(Fore.RESET + "\n[+] Run SQLi checker? [y/n]\n[OPTION] ==> ")
-if decision3 == "y":
-    checker()
-else:
-    print(Fore.RESET + "Thanks for using D0RK3R!")
+    elif usr_inpt == "2":
+        checker()
+        exit(0)
+
+    else:
+        print(Fore.RESET + "Thanks for using D0RK3R!")
+        exit(0)
+
+
+if __name__ == '__main__':
+    main()
