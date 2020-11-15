@@ -6,7 +6,7 @@ from colorama import Fore
 from bs4 import BeautifulSoup
 from bin.usr_agnt import rndm_ua
 
-version = "1.0"
+version = "1.1"
 info = (Fore.RESET + "\n  Dorker" + "\n   Version: " + version + " made with ♥ by FARBER")
 result_name = "dorker_results.txt"
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
