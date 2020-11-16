@@ -4,6 +4,7 @@ import urllib3
 import platform
 from colorama import Fore
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 version = "1.2"
 info = (Fore.RESET + "\n  Dorker" + "\n   Version: " + version + " made with ♥ by FARBER")
@@ -161,35 +162,29 @@ def dorker_logo():
     print(''.join([random.choice(colors) + char for char in logotype]) + info + "\n")
 
 
-def dorker():
+def dorker(use_one_dork, user_dork):
     pages = 1
-    how_much = 15
-    use_one_dork = input(Fore.RESET + "[+] Use one dork? [y/n]\n[OPTION] ==> ")
     if use_one_dork != "y":
         print("[+] Checking dorks.txt...")
         file_with_dorks = open("dorks.txt", "r")
         dorks = [line for line in file_with_dorks.readlines()]
         file_with_dorks.close()
-        a = len(dorks)
         c = 0
-        while c < int(a):
-            while pages != int(how_much):
+        for dork in dorks:
+            pages = 1
+            while pages <= 15:
                 # print("\n\n\nTrying dork: " + str(dorks[c]))
-                # send = requests.get("http://www1.search-results.com/web?q=" + str(dorks[c]) + "&page=" + str(pages))
-                # parsing = BeautifulSoup(send.text, features="html.parser")
-                send = http.request("GET", "http://www1.search-results.com/web?q=" + str(dorks[c]) + "&page="
-                                    + str(pages))
+                send = http.request("GET", "http://www1.search-results.com/web?q=" + str(dork) + "&page=" + str(pages))
                 parsing = BeautifulSoup(send.data.decode('utf-8'), features="html.parser")
                 for data in parsing.find_all("cite"):
                     print(data.string)
                     f = open(result_name, "a", encoding="utf=8")
                     f.write(data.string + "\n")
                     f.close()
-                pages = pages + 1
-            c = c + 1
+                pages += 1
+            c += 1
     else:
-        user_dork = input("[+] Enter your dork:\n[OPTION] ==> ")
-        while pages != int(how_much):
+        while pages <= 15:
             # print(Fore.RESET + "\n\n\nTrying dork: " + user_dork)
             send = http.request("GET", "http://www1.search-results.com/web?q=" + user_dork + "&page=" + str(pages))
             parsing = BeautifulSoup(send.data.decode('utf-8'), features="html.parser")
@@ -198,7 +193,7 @@ def dorker():
                 f = open(result_name, "a", encoding="utf=8")
                 f.write(data.string + "\n")
                 f.close()
-            pages = pages + 1
+            pages += 1
 
 
 def checker():
@@ -252,16 +247,40 @@ def checker():
         x = x + 1
 
 
+def specific_scan(site):
+    send = http.request("GET", site)
+    parsing = BeautifulSoup(send.data.decode('utf-8'), features="html.parser")
+
+    current_time = datetime.today().strftime("%H.%M.%S-%d-%m")
+
+    for data in parsing.find_all("a"):
+        if data.get('href').startswith("/"):
+            to_write = site + str(data.get('href'))
+        else:
+            to_write = data.get('href')
+        print(to_write)
+
+        f = open(current_time + ".hrefs.txt", "a", encoding="utf=8")
+        f.write(to_write + "\n")
+        f.close()
+
+
 def main():
     dorker_logo()
     usr_inpt = input('''
 [1] Dorker
 [2] SQLi checker
-[3] Exit
+[3] Scan specific site
+[99] Exit
 [!] ==> ''')
     if usr_inpt == "1":
-        dorker()
-        decision = input(Fore.RESET + "\n[+] Run SQLi checker? [y/n]\n[OPTION] ==> ")
+        use_one_dork = input(Fore.RESET + "[+] Use one dork? [y/n]\n[OPTION] ==> ")
+        if use_one_dork != "y":
+            dorker(use_one_dork, ' ')
+        else:
+            user_dork = input("[+] Enter your dork:\n[OPTION] ==> ")
+            dorker(use_one_dork, user_dork)
+        decision = input(Fore.RESET + "\n[+] Run SQLi checker? [y/n]\n==> ")
         if decision == "y":
             checker()
             print(Fore.RESET + "Thanks for using D0RK3R!")
@@ -272,6 +291,12 @@ def main():
 
     elif usr_inpt == "2":
         checker()
+        exit(0)
+
+    elif usr_inpt == "3":
+        site = input("Enter site:\n==> ")
+        specific_scan(site)
+        dorker("y", "inurl:" + site)
         exit(0)
 
     else:
