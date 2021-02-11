@@ -1,2 +1,7 @@
-inurl:index.php?id=
-inurl:index.php?cid=
+index.php?id=
+news.php?id=
+view.php?where=
+blank.php?subject=
+path.php?play=
+base.php?l=
+include.php?my=
