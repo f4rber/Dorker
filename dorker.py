@@ -10,10 +10,11 @@ from urllib3.util import Retry
 from urllib3.util import Timeout
 from multiprocessing import Pool, freeze_support
 
-version = "1.4"
+version = "1.5"
 info = (Fore.RESET + "\n  Dorker" + "\n   Version: " + version + " made with ♥ by FARBER")
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-urls = []
+dorks = []
+dorker_urls = []
 sites = []
 result_name = "dorker_results.txt"
 num_threads = 5
@@ -65,8 +66,7 @@ header = {
     'Accept': '*/*',
     'Connection': 'keep-alive'
 }
-retries = Retry(connect=6, read=3, redirect=6)
-http = urllib3.PoolManager(2, headers=header, retries=retries, cert_reqs=False)
+http = urllib3.PoolManager(2, headers=header, cert_reqs=False)
 
 colors = list(vars(Fore).values())
 if '\x1b[30m' in colors:
@@ -139,101 +139,119 @@ def dorker_logo():
     print(''.join([random.choice(colors) + char for char in logotype]) + info + "\n")
 
 
-def dorker(use_one_dork, user_dork):
-    pages = 1
-    if use_one_dork != "y":
-        print(Fore.RESET + "[+] Checking dorks.txt...")
-        file_with_dorks = open("dorks.txt", "r")
-        dorks = [line for line in file_with_dorks.readlines()]
-        file_with_dorks.close()
-        for dork in dorks:
-            pages = 1
-            while pages <= 15:
-                send1 = http.request("GET", "http://www1.search-results.com/web?q=" + dork + "&page=" + str(pages))
-                try:
-                    parsing = BeautifulSoup(send1.data.decode('utf-8'), features="html.parser")
-                except Exception as ex:
-                    print(Fore.RESET + "Error:\n" + str(ex) + "Trying latin-1...")
-                    parsing = BeautifulSoup(send1.data.decode('latin-1'), features="html.parser")
-                for data in parsing.find_all("cite"):
-                    print(Fore.RESET + data.string)
-                    f = open(result_name, "a", encoding="utf=8")
-                    f.write(data.string + "\n")
-                    f.close()
+def dorker(dork):
+    global dorks, dorker_urls
+    # f = open(result_name, "a", encoding="utf=8")
+    for pages in range(1, 16):
+        print(Fore.RESET + "\nPAGE: " + str(pages) + "\nDORK: " + str(dork))
+        # Search-results
+        print(Fore.RESET + "Search-results:")
+        send1 = http.request("GET", "http://www1.search-results.com/web?q=" + dork + "&page=" + str(pages),
+                             retries=Retry(3), timeout=Timeout(5))
+        try:
+            parsing1 = BeautifulSoup(send1.data.decode('utf-8'), features="html.parser")
+        except Exception as ex:
+            print(Fore.YELLOW + "Error:\n" + str(ex) + "Trying latin-1...")
+            parsing1 = BeautifulSoup(send1.data.decode('latin-1'), features="html.parser")
+        for data in parsing1.find_all("cite"):
+            print(Fore.RESET + data.string)
+            # Remove same results
+            if str(data.string) not in dorker_urls:
+                dorker_urls.append(str(data.string))
+                # f.write(data.string + "\n")
 
-                send2 = http.request("GET", "https://search.auone.jp/?q=" + dork + "&ie=UTF-8&page=" + str(pages))
-                try:
-                    parsing = BeautifulSoup(send2.data.decode('utf-8'), features="html.parser")
-                except Exception as ex:
-                    print("Error:\n" + str(ex) + "Trying latin-1...")
-                    parsing = BeautifulSoup(send2.data.decode('latin-1'), features="html.parser")
+        # Auone
+        print(Fore.RESET + "Auone:")
+        send2 = http.request("GET", "https://search.auone.jp/?q=" + dork + "&ie=UTF-8&page=" + str(pages),
+                             retries=Retry(3), timeout=Timeout(5))
+        try:
+            parsing2 = BeautifulSoup(send2.data.decode('utf-8'), features="html.parser")
+        except Exception as ex:
+            print(Fore.YELLOW + "Error:\n" + str(ex) + "Trying latin-1...")
+            parsing2 = BeautifulSoup(send2.data.decode('latin-1'), features="html.parser")
+        for data in parsing2.find_all("h2", class_="web-Result__site u-TextEllipsis"):
+            for url in data.find_all("a"):
+                print(Fore.RESET + str(url.get('href')))
+                # Remove same results
+                if str(url.get('href')) not in dorker_urls:
+                    dorker_urls.append(str(url.get('href')))
+                    # f.write(url.get('href') + "\n")
 
-                for data in parsing.find_all("h2", class_="web-Result__site u-TextEllipsis"):
-                    for url in data.find_all("a"):
-                        print(Fore.RESET + str(url.get('href')))
-                        f = open(result_name, "a", encoding="utf=8")
-                        f.write(url.get('href') + "\n")
-                        f.close()
+        # Qwant
+        print(Fore.RESET + "Qwant:")
+        send3 = http.request("GET", "https://lite.qwant.com/?q=" + dork + "&p=" + str(pages), retries=Retry(4),
+                             timeout=Timeout(5))
+        try:
+            parsing3 = BeautifulSoup(send3.data.decode('utf-8'), features="html.parser")
+        except Exception as ex:
+            print("Error:\n" + str(ex) + "Trying latin-1...")
+            parsing3 = BeautifulSoup(send3.data.decode('latin-1'), features="html.parser")
+        for data in parsing3.find_all("p", class_="url"):
+            print(str(data.string.replace(" ", "")))
+            # Remove same results
+            if str(data.string.replace(" ", "")) not in dorker_urls:
+                dorker_urls.append(str(data.string.replace(" ", "")))
+                # f.write(str(data.string.replace(" ", "")) + "\n")
 
-                pages += 1
+        # Lilo
+        print(Fore.RESET + "Lilo:")
+        send4 = http.request("GET", "https://search.lilo.org/?q=" + dork + "&date=All&page=" + str(pages),
+                             retries=Retry(4), timeout=Timeout(5))
+        try:
+            parsing4 = BeautifulSoup(send4.data.decode('utf-8'), features="html.parser")
+        except Exception as ex:
+            print(Fore.YELLOW + "Error:\n" + str(ex) + "Trying latin-1...")
+            parsing4 = BeautifulSoup(send4.data.decode('latin-1'), features="html.parser")
+        for data in parsing4.find_all("a", class_="resulturl d-block"):
+            print(Fore.RESET + str(data.get("href")))
+            # Remove same results
+            if str(data.get("href")) not in dorker_urls:
+                dorker_urls.append(str(data.get("href")))
+                # f.write(data.get("href")) + "\n")
 
-    else:
-        while pages <= 15:
-            send1 = http.request("GET", "http://www1.search-results.com/web?q=" + user_dork + "&page=" + str(pages))
-            try:
-                parsing = BeautifulSoup(send1.data.decode('utf-8'), features="html.parser")
-            except Exception as ex:
-                print(Fore.RESET + "Error:\n" + str(ex) + "Trying latin-1...")
-                parsing = BeautifulSoup(send1.data.decode('latin-1'), features="html.parser")
-            for data in parsing.find_all("cite"):
-                print(Fore.RESET + data.string)
-                f = open(result_name, "a", encoding="utf=8")
-                f.write(data.string + "\n")
-                f.close()
+        # Mywebsearch
+        print(Fore.RESET + "Mywebsearch:")
+        send5 = http.request("GET", "https://int.search.mywebsearch.com/mywebsearch/GGmain.jhtml?searchfor=" +
+                             dork + "&pn=" + str(pages), retries=Retry(4), timeout=Timeout(5))
+        try:
+            parsing5 = BeautifulSoup(send5.data.decode('utf-8'), features="html.parser")
+        except Exception as ex:
+            print("Error:\n" + str(ex) + "Trying latin-1...")
+            parsing5 = BeautifulSoup(send5.data.decode('latin-1'), features="html.parser")
+        for data in parsing5.find_all("cite"):
+            print(Fore.RESET + str(data.string))
+            # Remove same results
+            if str(data.get("href")) not in dorker_urls:
+                dorker_urls.append(str(data.string))
+                # f.write(data.string) + "\n")
 
-            send2 = http.request("GET", "https://search.auone.jp/?q=" + user_dork + "&ie=UTF-8&page=" + str(pages))
-            try:
-                parsing = BeautifulSoup(send2.data.decode('utf-8'), features="html.parser")
-            except Exception as ex:
-                print("Error:\n" + str(ex) + "Trying latin-1...")
-                parsing = BeautifulSoup(send2.data.decode('latin-1'), features="html.parser")
-
-            for data in parsing.find_all("h2", class_="web-Result__site u-TextEllipsis"):
-                for url in data.find_all("a"):
-                    print(Fore.RESET + str(url.get('href')))
-                    f = open(result_name, "a", encoding="utf=8")
-                    f.write(url.get('href') + "\n")
-                    f.close()
-
-            pages += 1
+    # f.close()
 
 
-def checker(url_list):
-    global urls
-
+def sqli_checker(site):
     error1 = "You have an error in your SQL syntax"
     error2 = "Warning: mysql_fetch_array()"
-    # site = dork_urls[urls]
-    site = url_list
+    if "=" in site:
+        try:
+            send = http.request("GET", str(site) + "'", retries=True, timeout=Timeout(5))
 
-    try:
-        send = http.request("GET", str(site) + "'", retries=True, timeout=Timeout(4))
+            if bytes(error1, encoding="utf-8") in send.data:
+                print(Fore.GREEN + str(site) + " seems vulnerable!\n")
+                injectable_url = open("sqli.txt", 'a')
+                injectable_url.write(str(site) + "\n")
+                injectable_url.close()
+            elif bytes(error2, encoding="utf-8") in send.data:
+                print(Fore.GREEN + str(site) + " seems vulnerable!\n")
+                injectable_url = open("sqli.txt", 'a')
+                injectable_url.write(str(site) + "\n")
+                injectable_url.close()
+            else:
+                print(Fore.RED + str(site) + " not vulnerable!\n")
 
-        if bytes(error1, encoding="utf-8") in send.data:
-            print(Fore.GREEN + str(site) + " seems vulnerable!\n")
-            injectable_url = open("injectableURL.txt", 'a')
-            injectable_url.write(str(site) + "\n")
-            injectable_url.close()
-        elif bytes(error2, encoding="utf-8") in send.data:
-            print(Fore.GREEN + str(site) + " seems vulnerable!\n")
-            injectable_url = open("injectableURL.txt", 'a')
-            injectable_url.write(str(site) + "\n")
-            injectable_url.close()
-        else:
-            print(Fore.RED + str(site) + " not vulnerable!\n")
-
-    except Exception as ex:
-        print(Fore.YELLOW + "\n[!] Exception: " + str(ex))
+        except Exception as ex:
+            print(Fore.YELLOW + "\n[!] Exception: " + str(ex))
+    else:
+        print(Fore.YELLOW + "\nSkipping " + site + "\n")
 
 
 def specific_scan(site):
@@ -255,7 +273,7 @@ def specific_scan(site):
     elif site.startswith("https://"):
         domain_to_check = site.replace('https://', '')
     else:
-        print(Fore.RESET + "Error")
+        print(Fore.YELLOW + "Error")
 
     send = http.request("GET", "https://dns.bufferover.run/dns?q=" + domain_to_check)
     try:
@@ -272,7 +290,7 @@ def specific_scan(site):
         f.close()
 
     # Get hrefs from site
-    print(Fore.RESET + "\nGrabbing hrefs from site...\n")
+    print(Fore.RESET + "\n[+] Grabbing hrefs from site...\n")
     send = http.request("GET", site)
     try:
         parsing = BeautifulSoup(send.data.decode('utf-8'), features="html.parser")
@@ -295,56 +313,65 @@ def specific_scan(site):
 
     # Running Dorker against subdomains we found before
     for subdomain in subdomain_list:
-        dorker("y", "inurl:" + subdomain.split(',')[-1])
+        dorker("inurl:" + subdomain.split(',')[-1])
 
 
 def main():
-    global urls, sites
+    global sites, dorks
     dorker_logo()
     usr_inpt = input('''
 [1] Dorker
 [2] SQLi checker
 [3] Scan specific site
 [99] Exit
-[!] ==> ''')
+ [:]==> ''')
 
     if usr_inpt == "1":
-        use_one_dork = input(Fore.RESET + "[+] Use one dork? [y/n]\n[OPTION] ==> ")
-        if use_one_dork != "y":
-            dorker(use_one_dork, ' ')
-            print(Fore.RESET + "\nThanks for using D0RK3R!")
-            exit(0)
+        print(Fore.RESET + "[+] Checking dorks.txt...\n")
+        file_with_dorks = open("dorks.txt", "r")
+        dorks = [line.split("\n")[0] for line in file_with_dorks.readlines()]
+        for dork in dorks:
+            print(Fore.RESET + dork)
+        file_with_dorks.close()
+
+        dorker_mode = input(Fore.RESET + "\n[!] Start dorker in multithread mode? y/n\n [:]==> ")
+        if dorker_mode != "n":
+            freeze_support()
+            pool = Pool(num_threads)
+            pool.map(dorker, dorks)
+            pool.close()
+            pool.join()
         else:
-            user_dork = input(Fore.RESET + "[+] Enter your dork:\n[OPTION] ==> ")
-            dorker(use_one_dork, user_dork)
-            print(Fore.RESET + "\nThanks for using D0RK3R!")
-            exit(0)
+            for dork in dorks:
+                dorker(dork)
+
+        # Write urls to txt file
+        f = open(result_name, "a", encoding="utf=8")
+        for url in dorker_urls:
+            f.write(url + "\n")
+        f.close()
+
+        print(Fore.RESET + "\nThanks for using D0RK3R!")
+        exit(0)
 
     elif usr_inpt == "2":
         try:
-            file_with_dorks = open(result_name, "r")
-            sites = [line for line in file_with_dorks.readlines()]
-            file_with_dorks.close()
+            file_with_dorker_results = open(result_name, "r")
+            sites = [line.split("\n")[0] for line in file_with_dorker_results.readlines()]
+            file_with_dorker_results.close()
         except Exception as ex:
             print(Fore.RESET + "Error:\n" + str(ex))
 
-        print(Fore.RESET + "\nPlease wait...\n")
-        for site in sites:
-            try:
-                urls.append(site.split("\n")[0])
-            except:
-                urls.append(site)
-
         freeze_support()
         pool = Pool(num_threads)
-        pool.map(checker, urls)
+        pool.map(sqli_checker, sites)
         pool.close()
         pool.join()
         print(Fore.RESET + "\nThanks for using D0RK3R!")
         exit(0)
 
     elif usr_inpt == "3":
-        site = input(Fore.RESET + "Enter site:\n==> ")
+        site = input(Fore.RESET + "[!] Enter site:\n [:]==> ")
         specific_scan(site)
         exit(0)
 
