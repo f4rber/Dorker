@@ -147,9 +147,9 @@ def dorker_logo():
 
 
 def dorker(dork):
-    global dorks, dorker_urls
-    # f = open(result_name, "a", encoding="utf=8")
+    global dorks
     for pages in range(1, 16):
+        f = open(result_name, "a", encoding="utf=8")
         print(Fore.RESET + "\nPAGE: " + str(pages) + "\nDORK: " + str(dork))
         # Search-results
         print(Fore.RESET + "Search-results:")
@@ -162,10 +162,8 @@ def dorker(dork):
             parsing1 = BeautifulSoup(send1.data.decode('latin-1'), features="html.parser")
         for data in parsing1.find_all("cite"):
             print(Fore.RESET + data.string)
-            # Remove same results
-            if str(data.string) not in dorker_urls:
-                dorker_urls.append(str(data.string))
-                # f.write(data.string + "\n")
+
+            f.write(data.string + "\n")
 
         # Auone
         print(Fore.RESET + "Auone:")
@@ -179,10 +177,8 @@ def dorker(dork):
         for data in parsing2.find_all("h2", class_="web-Result__site u-TextEllipsis"):
             for url in data.find_all("a"):
                 print(Fore.RESET + str(url.get('href')))
-                # Remove same results
-                if str(url.get('href')) not in dorker_urls:
-                    dorker_urls.append(str(url.get('href')))
-                    # f.write(url.get('href') + "\n")
+
+                f.write(url.get('href') + "\n")
 
         # Qwant
         print(Fore.RESET + "Qwant:")
@@ -195,10 +191,8 @@ def dorker(dork):
             parsing3 = BeautifulSoup(send3.data.decode('latin-1'), features="html.parser")
         for data in parsing3.find_all("p", class_="url"):
             print(str(data.string.replace(" ", "")))
-            # Remove same results
-            if str(data.string.replace(" ", "")) not in dorker_urls:
-                dorker_urls.append(str(data.string.replace(" ", "")))
-                # f.write(str(data.string.replace(" ", "")) + "\n")
+
+            f.write(str(data.string.replace(" ", "")) + "\n")
 
         # Lilo
         print(Fore.RESET + "Lilo:")
@@ -211,10 +205,8 @@ def dorker(dork):
             parsing4 = BeautifulSoup(send4.data.decode('latin-1'), features="html.parser")
         for data in parsing4.find_all("a", class_="resulturl d-block"):
             print(Fore.RESET + str(data.get("href")))
-            # Remove same results
-            if str(data.get("href")) not in dorker_urls:
-                dorker_urls.append(str(data.get("href")))
-                # f.write(data.get("href")) + "\n")
+
+            f.write(data.get("href") + "\n")
 
         # Mywebsearch
         print(Fore.RESET + "Mywebsearch:")
@@ -227,12 +219,10 @@ def dorker(dork):
             parsing5 = BeautifulSoup(send5.data.decode('latin-1'), features="html.parser")
         for data in parsing5.find_all("cite"):
             print(Fore.RESET + str(data.string))
-            # Remove same results
-            if str(data.get("href")) not in dorker_urls:
-                dorker_urls.append(str(data.string))
-                # f.write(data.string) + "\n")
 
-    # f.close()
+            f.write(data.string + "\n")
+
+        f.close()
 
 
 def sqli_checker(site):
@@ -428,15 +418,23 @@ def main():
             pool.map(dorker, dorks)
             pool.close()
             pool.join()
+
         else:
             for dork in dorks:
                 dorker(dork)
 
-        # Write urls to txt file
-        f = open(result_name, "a", encoding="utf=8")
-        for url in dorker_urls:
-            f.write(url + "\n")
-        f.close()
+        same_results = open(result_name, "r")
+        results = [line.split("\n")[0] for line in same_results.readlines()]
+        same_results.close()
+        os.remove(result_name)
+
+        clean_results = open(result_name, "a", encoding="utf=8")
+
+        for url in results:
+            if url not in dorker_urls:
+                dorker_urls.append(str(url))
+                clean_results.write(url + "\n")
+        clean_results.close()
 
         print(Fore.RESET + "\nThanks for using D0RK3R!")
         exit(0)
