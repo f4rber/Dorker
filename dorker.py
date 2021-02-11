@@ -236,20 +236,20 @@ def sqli_checker(site):
             send = http.request("GET", str(site) + "'", retries=True, timeout=Timeout(5))
 
             if bytes(error1, encoding="utf-8") in send.data:
-                print(Fore.GREEN + str(site) + " seems vulnerable!\n")
+                print(Fore.GREEN + str(site) + " seems vulnerable!")
                 injectable_url = open("sqli.txt", 'a')
                 injectable_url.write(str(site) + "\n")
                 injectable_url.close()
             elif bytes(error2, encoding="utf-8") in send.data:
-                print(Fore.GREEN + str(site) + " seems vulnerable!\n")
+                print(Fore.GREEN + str(site) + " seems vulnerable!")
                 injectable_url = open("sqli.txt", 'a')
                 injectable_url.write(str(site) + "\n")
                 injectable_url.close()
             else:
-                print(Fore.RED + str(site) + " not vulnerable!\n")
+                print(Fore.RED + str(site) + " not vulnerable!")
 
         except Exception as ex:
-            print(Fore.YELLOW + "\n[!] Exception: " + str(ex))
+            print(Fore.YELLOW + str(site))
     else:
         print(Fore.YELLOW + "\nSkipping " + site + "\n")
 
