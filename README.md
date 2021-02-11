@@ -4,11 +4,12 @@ Let the D0RK3R make dirty work :)
 This script can be quite useful in early phases of pentest.
 
 Current tool set:
+```
 [1] Dorker
 [2] SQLi checker
 [3] LFI checker
 [4] Scan specific site
-
+```
 # Examples
 
 # Find information by dorks
