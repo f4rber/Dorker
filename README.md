@@ -91,7 +91,8 @@ https://www.dt-shop.com/index.php?id=3&L=1
 https://www.swissport.com/index.php?id=4&level=country&continentId=4&countryId=177
 https://www.car-2-car.org/service/login/
 http://www.wesley.edu/index.php?id=32
-https://www.ccbe.eu/index.php?id=12&L=0```
+https://www.ccbe.eu/index.php?id=12&L=0
+```
 # Check for SQLi
 ```
      ____  ____  ____  __ __ __________
