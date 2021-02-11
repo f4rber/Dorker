@@ -1,7 +1,13 @@
 # Dorker
 Let the D0RK3R make dirty work :)
 
-This tool can be quite useful in early phases of pentest.
+This script can be quite useful in early phases of pentest.
+
+Current tool set:
+[1] Dorker
+[2] SQLi checker
+[3] LFI checker
+[4] Scan specific site
 
 # Examples
 
@@ -19,7 +25,8 @@ This tool can be quite useful in early phases of pentest.
 
 [1] Dorker
 [2] SQLi checker
-[3] Scan specific site
+[3] LFI checker
+[4] Scan specific site
 [99] Exit
  [:]==> 1
 [+] Checking dorks.txt...
@@ -107,7 +114,8 @@ https://www.ccbe.eu/index.php?id=12&L=0
 
 [1] Dorker
 [2] SQLi checker
-[3] Scan specific site
+[3] LFI checker
+[4] Scan specific site
 [99] Exit
  [:]==> 2
 Skipping https://www.darknet.org.uk/2017/10/sqliv-sql-injection-dork-scanning-tool
