@@ -190,9 +190,9 @@ def dorker(dork):
             print("Error:\n" + str(ex) + "Trying latin-1...")
             parsing3 = BeautifulSoup(send3.data.decode('latin-1'), features="html.parser")
         for data in parsing3.find_all("p", class_="url"):
-            print(str(data.string.replace(" ", "")))
+            print(str(data.string).replace(" ", ""))
 
-            f.write(str(data.string.replace(" ", "")) + "\n")
+            f.write(str(data.string).replace(" ", "") + "\n")
 
         # Lilo
         print(Fore.RESET + "Lilo:")
