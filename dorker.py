@@ -432,10 +432,14 @@ def main():
 
         for url in results:
             if url not in dorker_urls:
-                dorker_urls.append(str(url))
-                clean_results.write(url + "\n")
-        clean_results.close()
+                if not str(url).startswith("https://support.google.com") and not str(url).startswith(
+                        "https://cve.mitre.org") and not str(url).startswith("https://stackoverflow.com"):
+                    if not str(url).startswith("http://cve.mitre.org") and not str(url).startswith(
+                            "http://support.google.com") and not str(url).startswith("http://stackoverflow.com"):
+                        dorker_urls.append(str(url))
+                        clean_results.write(url + "\n")
 
+        clean_results.close()
         print(Fore.RESET + "\nThanks for using D0RK3R!")
         exit(0)
 
