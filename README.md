@@ -10,6 +10,13 @@ Current tool set:
 [3] LFI checker
 [4] Scan specific site
 ```
+```
+
+To enable HTTP proxy mode you need to create a "proxy_list.txt" which will contain proxies like:
+192.167.81.18:8080
+128.171.81.18:80
+34.63.31.168:5427
+```
 # Examples
 
 # Find information by dorks
